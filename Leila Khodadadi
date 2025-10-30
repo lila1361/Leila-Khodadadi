@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>آزمون تستی - لیلا خدادادی</title>
+  <style>
+    body { font-family: Vazirmatn, "Tahoma", "Segoe UI", sans-serif; background:#f5f7fb; color:#222; margin:0; padding:0; }
+    .header { background:#3b82f6; color:#fff; padding:18px 20px; text-align:center; font-size:20px; font-weight:700; }
+    .container { max-width:880px; margin:28px auto; background:#fff; border-radius:12px; box-shadow:0 8px 30px rgba(30,40,60,0.08); padding:22px; }
+    label { display:block; margin-bottom:6px; font-weight:600; }
+    .center { text-align:center; }
+    input[type="text"] { width:100%; padding:10px 12px; font-size:16px; border:1px solid #d0d7de; border-radius:8px; box-sizing:border-box; }
+    button { background:#10b981; color:#fff; border:none; padding:10px 16px; border-radius:8px; font-size:16px; cursor:pointer; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    .start-row { margin-top:12px; display:flex; justify-content:center; }
+    .question { margin:18px 0; padding:14px; border:1px solid #eef2ff; border-radius:8px; background:#fbfdff; }
+    .q-title { font-weight:700; margin-bottom:8px; }
+    .options label { display:block; margin:8px 0; padding:8px 10px; border-radius:8px; border:1px solid transparent; cursor:pointer; }
+    .options input[type="radio"] { margin-left:8px; }
+    .options label:hover { background:#f0f9ff; }
+    .footer-row { margin-top:18px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+    .result { text-align:center; padding:18px; background:#eefdf6; border-radius:10px; font-weight:700; }
+    .small { font-size:14px; color:#666; margin-top:8px; }
+    .hidden { display:none; }
+    @media (max-width:640px){ .container{ margin:12px; padding:14px } }
+  </style>
+</head>
+<body>
+  <div class="header">لیلا خدادادی</div>
+
+  <div class="container" id="page-welcome">
+    <h2 class="center">آزمون تستی</h2>
+    <p class="center small">لطفاً نام و نام خانوادگی خود را وارد کنید سپس روی دکمه‌ی «شروع آزمون» بزنید.</p>
+
+    <label for="fullname">نام و نام خانوادگی</label>
+    <input id="fullname" type="text" placeholder="مثال: علی یعقوب‌زاده" />
+
+    <div class="start-row">
+      <button id="startBtn">شروع آزمون</button>
+    </div>
+  </div>
+
+  <div class="container hidden" id="page-quiz">
+    <h3 class="center">سوالات آزمون</h3>
+    <div id="questionsContainer"></div>
+
+    <div class="footer-row">
+      <div>
+        <span class="small">تعداد سوالات: <strong id="totalCount">0</strong></span>
+      </div>
+      <div>
+        <button id="submitBtn">پایان آزمون و مشاهده نتیجه</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="page-result">
+    <h3 class="center">نتیجه‌ی آزمون</h3>
+    <div class="result" id="resultText"></div>
+    <p class="center small" id="detailText"></p>
+    <div class="center" style="margin-top:14px">
+      <button id="restartBtn">آزمون دوباره</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {q:"1- چند بسته صدتایی میشه هزارتا؟", options:["۹ تا","۸ تا","۵ تا","۱۰ تا"], correct:3},
+      {q:"2- ساعت ۱ وقتی میره بعدازظهر میشه ساعت چند؟", options:["۱۵","۱۴","۱۳","۱۶"], correct:2},
+      {q:"3- یک شکل مستطیل چند خط تقارن داره؟", options:["۲ تا","۳ تا","۴ تا","یکی"], correct:0},
+      {q:"4- جمع دو عدد را که حاصل جمع آن ها ۹ بشه، به چند حالت میشه نوشت؟", options:["۵ حالت","۶ حالت","۸ حالت","۱۰ حالت"], correct:3},
+      {q:"5- شباهت عدد و رقم مثل شباهت...؟", options:["دوست و دشمن","دوست و همسایه","حرف و کلمه","دوتا دوست"], correct:2},
+      {q:"6- هم معنی کلمه‌ی ثبت نام میشه ؟", options:["آغوش","فکر","نام نویسی","ناراحت"], correct:2},
+      {q:"7- مخالف کلمه‌ی آشنا چی میشه؟", options:["آشنایی","غریبه","غریبگی","دوست"], correct:0},
+      {q:"8- کدام یک از گزینه های زیر هم‌خانوادهٔ «خاطرات» هست؟", options:["مخاطره","خطر","خطرات","خاطره"], correct:3},
+      {q:"9- علی و عباس به سینما.......؟ با کدام گزینه مناسب کامل می‌شود؟", options:["رفتند","آمدند","رفتیم","آمدند"], correct:0},
+      {q:"10- روش‌های کاوشگری دانشمندان به ترتیب مرحلهٔ دوم چی میشه؟", options:["مشاهده","پرسش","فرضیه‌سازی","جمع‌آوری اطلاعات"], correct:1},
+      {q:"11- در بشقاب سلامت بهتر است کمتر از کدام گروه مواد غذایی استفاده کنیم؟", options:["گروه غلات","گروه میوه‌ها و سبزی‌ها","گروه شیر و لبنیات","گروه چربی‌ها"], correct:3},
+      {q:"12- در بسته‌بندی بعضی خوراکی‌ها مواد نگهدارنده و مواد افزودنی نوشته شده؛ این‌ها چه معنی دارند؟", options:["تاریخ مصرف","تاریخ تولید","خوشمزه بودن","زمان نگهداری را افزایش می‌دهد"], correct:3},
+      {q:"13- برای اندازه‌گیری مواد مختلف از چه وسیله‌ای استفاده کنیم؟", options:["حس لامسه","حس بینایی","ترازوهای مختلف","متر"], correct:2},
+      {q:"14- اگر همهٔ انسان‌ها شبیه هم بودند چی می‌شد؟", options:["توانایی‌هاشون کاملاً شبیه هم بود","نمی‌توانستند یکدیگر را از هم تشخیص دهند","همه یک شغل داشتند و نمی‌توانستند نیازهای هم را برطرف کنند","همهٔ موارد"], correct:3},
+      {q:"15- از درس سوم هدیه‌ها فهمیدیم کسی که همیشه بهترین یار و محافظ ماست کیست؟", options:["پدر","مادر","دوستانم","خدا"], correct:3}
+    ];
+
+    const pageWelcome=document.getElementById('page-welcome');
+    const pageQuiz=document.getElementById('page-quiz');
+    const pageResult=document.getElementById('page-result');
+    const startBtn=document.getElementById('startBtn');
+    const fullnameInput=document.getElementById('fullname');
+    const questionsContainer=document.getElementById('questionsContainer');
+    const totalCount=document.getElementById('totalCount');
+    const submitBtn=document.getElementById('submitBtn');
+    const resultText=document.getElementById('resultText');
+    const detailText=document.getElementById('detailText');
+    const restartBtn=document.getElementById('restartBtn');
+
+    totalCount.textContent=questions.length;
+
+    function renderQuestions(){
+      questionsContainer.innerHTML='';
+      questions.forEach((item,idx)=>{
+        const div=document.createElement('div');
+        div.className='question';
+        div.innerHTML=`
+          <div class="q-title">${idx+1}. ${item.q}</div>
+          <div class="options" id="q${idx}">
+            ${item.options.map((opt,i)=>(
+              `<label>
+                <input type="radio" name="q_${idx}" value="${i}" />
+                ${["الف:","ب:","ج:","د:"][i]} ${opt}
+              </label>`
+            )).join('')}
+          </div>
+        `;
+        questionsContainer.appendChild(div);
+      });
+    }
+
+    startBtn.addEventListener('click',()=>{
+      const name=fullnameInput.value.trim();
+      if(!name){ alert('لطفاً نام و نام خانوادگی خود را وارد کنید.'); fullnameInput.focus(); return; }
+      pageWelcome.classList.add('hidden');
+      renderQuestions();
+      pageQuiz.classList.remove('hidden');
+      window.scrollTo(0,0);
+    });
+
+    submitBtn.addEventListener('click',()=>{
+      const name=fullnameInput.value.trim()||'کاربر';
+      let score=0;
+      for(let i=0;i<questions.length;i++){
+        const radios=document.getElementsByName('q_'+i);
+        let chosen=null;
+        for(const r of radios){ if(r.checked){ chosen=parseInt(r.value); break; } }
+        if(chosen===questions[i].correct) score++;
+      }
+      pageQuiz.classList.add('hidden');
+      pageResult.classList.remove('hidden');
+      resultText.textContent=`${name} از ${questions.length} سوال، به ${score} سوال درست پاسخ داده است.`;
+      detailText.textContent=`تعداد پاسخ‌های صحیح: ${score} | تعداد سوال‌ها: ${questions.length}`;
+      window.scrollTo(0,0);
+    });
+
+    restartBtn.addEventListener('click',()=>{
+      for(let i=0;i<questions.length;i++){
+        const radios=document.getElementsByName('q_'+i);
+        for(const r of radios) r.checked=false;
+      }
+      pageResult.classList.add('hidden');
+      pageWelcome.classList.remove('hidden');
+      fullnameInput.focus();
+      window.scrollTo(0,0);
+    });
+
+    fullnameInput.addEventListener('keydown',(e)=>{
+      if(e.key==='Enter'){ e.preventDefault(); startBtn.click(); }
+    });
+  </script>
+</body>
+</html>
